@@ -19,9 +19,23 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
         {
             Local = this;
 
+            Camera.main.gameObject.SetActive(false);
+
             Debug.Log("Spawned local player");
         }
-        else Debug.Log("Spawned remote player");
+        else
+        {
+            Camera localCamera = GetComponentInChildren<Camera>();
+            localCamera.enabled = false;
+
+            AudioListener audioListener = GetComponentInChildren<AudioListener>();
+            audioListener.enabled = false;
+
+            Debug.Log("Spawned remote player");
+        }
+
+        //Rename player prefab
+        transform.name = $"P_{Object.Id}";
     }
 
     public void PlayerLeft(PlayerRef player)

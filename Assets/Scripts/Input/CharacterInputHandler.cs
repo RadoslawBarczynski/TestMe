@@ -7,12 +7,13 @@ public class CharacterInputHandler : MonoBehaviour
     Vector2 moveInputVector = Vector2.zero;
     Vector2 viewInputVector = Vector2.zero;
     bool isJumpButtonPressed = false;
+    bool isCrouchButtonPressed = false;
 
     //Other components
-    CharacterMovementHandler characterMovementHandler;
+    LocalCameraHandler localCameraHandler;
     private void Awake()
     {
-        characterMovementHandler = GetComponent<CharacterMovementHandler>();
+        localCameraHandler = GetComponentInChildren<LocalCameraHandler>();
     }
 
     // Start is called before the first frame update
@@ -29,27 +30,42 @@ public class CharacterInputHandler : MonoBehaviour
         viewInputVector.x = Input.GetAxis("Mouse X");
         viewInputVector.y = Input.GetAxis("Mouse Y") * -1; //Invert the mouse look
 
-        characterMovementHandler.SetViewInputVector(viewInputVector);
-
         //Move input
         moveInputVector.x = Input.GetAxis("Horizontal");
         moveInputVector.y = Input.GetAxis("Vertical");
 
-        isJumpButtonPressed = Input.GetButtonDown("Jump");
+        //jump input
+        if(Input.GetButtonDown("Jump"))
+            isJumpButtonPressed = true;
+
+        if (Input.GetKeyDown(KeyCode.C) && isCrouchButtonPressed == false)
+        {
+            isCrouchButtonPressed = true;
+        }
+
+        //set view
+        localCameraHandler.SetViewInputVector(viewInputVector);
+        
     }
 
     public NetworkInputData GetNetworkInput()
     {
         NetworkInputData networkInputData = new NetworkInputData();
 
-        //View data
-        networkInputData.rotationInput = viewInputVector.x;
+        //Aim data
+        networkInputData.aimForwardVector = localCameraHandler.transform.forward;
 
         //Move data
         networkInputData.movementInput = moveInputVector;
 
         //Jump data
         networkInputData.isJumpPressed = isJumpButtonPressed;
+
+        networkInputData.isCrouchedPressed = isCrouchButtonPressed;
+
+        //reset variables to read their states
+        isJumpButtonPressed = false;
+        isCrouchButtonPressed = false;
 
         return networkInputData;
     }
