@@ -9,4 +9,5 @@ public struct NetworkInputData : INetworkInput
     public Vector3 aimForwardVector;
     public NetworkBool isJumpPressed;
     public NetworkBool isCrouchedPressed;
+    public NetworkBool isFireButtonPressed;
 }

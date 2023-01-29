@@ -83,6 +83,22 @@ public class NetworkCharacterControllerPrototypeCustom : NetworkTransform {
     }
   }
 
+    public virtual void Crouch(bool ignoreGrounded = false, float? overrideImpulse = null)
+    {
+        if (IsGrounded || ignoreGrounded)
+        {
+            maxSpeed = 2f;
+        }
+    }
+
+    public virtual void UnCrouch(bool ignoreGrounded = false, float? overrideImpulse = null)
+    {
+        if (IsGrounded || ignoreGrounded)
+        {
+            maxSpeed = 6f;
+        }
+    }
+
 
     /// <summary>
     /// Basic implementation of a character controller's movement function based on an intended direction.

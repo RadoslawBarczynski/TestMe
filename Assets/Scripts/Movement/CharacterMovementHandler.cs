@@ -6,26 +6,46 @@ using ExitGames.Client.Photon.StructWrapping;
 
 public class CharacterMovementHandler : NetworkBehaviour
 {
+    bool isRespawnRequested = false;
+    float startYScale;
+    float crouchYScale = 0.7f;
 
     //Other components
     NetworkCharacterControllerPrototypeCustom networkCharacterControllerPrototypeCustom;
-    Camera localCamera;
+    HPHandler hPHandler;
+    CharacterController characterController;
 
     private void Awake()
     {
         networkCharacterControllerPrototypeCustom = GetComponent<NetworkCharacterControllerPrototypeCustom>();
-        localCamera = GetComponentInChildren<Camera>();
+        hPHandler = GetComponent<HPHandler>();
+        characterController = GetComponent<CharacterController>();
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        startYScale = transform.localScale.y;
     }
 
 
     public override void FixedUpdateNetwork()
     {
+        if (Object.HasStateAuthority)
+        {
+            if (isRespawnRequested)
+            {
+                Respawn();
+                return;
+            }
+
+            //dont update the clients position when they are dead
+            if (hPHandler.isDead)
+            {
+                return;
+            }
+        }
+
         //Get the input from the network
         if (GetInput(out NetworkInputData networkInputData))
         {
@@ -44,9 +64,22 @@ public class CharacterMovementHandler : NetworkBehaviour
             networkCharacterControllerPrototypeCustom.Move(moveDirection);
 
             //Jump
-            if(networkInputData.isJumpPressed)
+            if (networkInputData.isJumpPressed)
+            {
                 networkCharacterControllerPrototypeCustom.Jump();
+            }
 
+            if (networkInputData.isCrouchedPressed)
+            {
+                networkCharacterControllerPrototypeCustom.Crouch();
+                transform.localScale = new Vector3(transform.localScale.x, crouchYScale, transform.localScale.z);
+            }
+            else if (!networkInputData.isCrouchedPressed)
+            {
+                networkCharacterControllerPrototypeCustom.UnCrouch();
+                //networkCharacterControllerPrototypeCustom.Velocity = new Vector3(networkCharacterControllerPrototypeCustom.Velocity.x, 0, networkCharacterControllerPrototypeCustom.Velocity.z);
+                transform.localScale = new Vector3(transform.localScale.x, 1, transform.localScale.z);
+            }
             //Check if player fallen off the world
             CheckFallRespawn();
         }
@@ -54,8 +87,29 @@ public class CharacterMovementHandler : NetworkBehaviour
 
     void CheckFallRespawn()
     {
-        if(transform.position.y < -12) 
-            transform.position = Utils.GetRandomSpawnPoint();
+        if (transform.position.y < -12)
+        {
+            Respawn();
+        }
+    }
+
+    public void RequestRespawn()
+    {
+        isRespawnRequested = true;
+    }
+
+    void Respawn()
+    {
+        networkCharacterControllerPrototypeCustom.TeleportToPosition(Utils.GetRandomSpawnPoint());
+
+        hPHandler.OnRespawned();
+
+        isRespawnRequested = false;
+    }
+
+    public void SetCharacterControllerEnabled(bool isEnabled)
+    {
+        networkCharacterControllerPrototypeCustom.Controller.enabled = isEnabled;
     }
 
 }
