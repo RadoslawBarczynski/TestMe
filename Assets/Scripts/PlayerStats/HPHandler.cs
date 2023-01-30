@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Fusion;
 using Unity.VisualScripting;
+using TMPro;
 
 public class HPHandler : NetworkBehaviour
 {
@@ -25,15 +26,18 @@ public class HPHandler : NetworkBehaviour
 
     public GameObject playerModel;
     public GameObject deathGameObjectPrefab;
+    public TextMeshProUGUI healthText;
 
     //components
     HitboxRoot hitboxRoot;
     CharacterMovementHandler characterMovementHandler;
+    WeaponHandler weaponHandler;
 
     private void Awake()
     {
         characterMovementHandler = GetComponent<CharacterMovementHandler>();
         hitboxRoot = GetComponentInChildren<HitboxRoot>();
+        weaponHandler = GetComponent<WeaponHandler>();
     }
     // Start is called before the first frame update
     void Start()
@@ -44,6 +48,13 @@ public class HPHandler : NetworkBehaviour
         defaultMeshBodyColor = bodyMeshRenderer.material.color;
 
         isInitialized = true;
+    }
+
+    void Update()
+    {
+        //health state display 
+        if(Object.HasInputAuthority)
+        healthText.text = "Health: " + HP + "/" + startingHP;
     }
 
     IEnumerator OnHitCO()
@@ -79,7 +90,7 @@ public class HPHandler : NetworkBehaviour
             return;
         }
 
-        HP -= 1;
+        HP -= (byte)weaponHandler.gunData.damage;
 
         Debug.Log($"{Time.time} {transform.name} has {HP} left");
 

@@ -4,20 +4,23 @@ using UnityEngine;
 
 public class CharacterInputHandler : MonoBehaviour
 {
-    Vector2 moveInputVector = Vector2.zero;
-    Vector2 viewInputVector = Vector2.zero;
+    public Vector2 moveInputVector = Vector2.zero;
+    public Vector2 viewInputVector = Vector2.zero;
     bool isJumpButtonPressed = false;
-    bool isCrouchButtonPressed = false;
-    int crouchState = 0;
+    public bool isCrouchButtonPressed = false;
     bool isFireButtonPressed = false;
+    public float currentRecoilXPos;
+    public float currentRecoilYPos;
 
-    //Other components
+    //components
     LocalCameraHandler localCameraHandler;
     CharacterMovementHandler characterMovementHandler;
+    WeaponHandler weaponHandler;
     private void Awake()
     {
         localCameraHandler = GetComponentInChildren<LocalCameraHandler>();
         characterMovementHandler = GetComponent<CharacterMovementHandler>();
+        weaponHandler = GetComponent<WeaponHandler>();
     }
 
     // Start is called before the first frame update
@@ -34,8 +37,8 @@ public class CharacterInputHandler : MonoBehaviour
             return;
 
         //View input
-        viewInputVector.x = Input.GetAxis("Mouse X");
-        viewInputVector.y = Input.GetAxis("Mouse Y") * -1; //Invert the mouse look
+        viewInputVector.x = Input.GetAxis("Mouse X") - weaponHandler.currentRecoilXPos; 
+        viewInputVector.y = Input.GetAxis("Mouse Y") * -1 - Mathf.Abs(weaponHandler.currentRecoilYPos); //Invert the mouse look
 
         //Move input
         moveInputVector.x = Input.GetAxis("Horizontal");
@@ -61,10 +64,15 @@ public class CharacterInputHandler : MonoBehaviour
         {
             isFireButtonPressed = true;
         }
+        if (Input.GetButtonUp("Fire1"))
+        {
+            isFireButtonPressed = false;
+            weaponHandler.currentRecoilXPos = 0;
+            weaponHandler.currentRecoilYPos = 0;
+        }
 
         //set view
-        localCameraHandler.SetViewInputVector(viewInputVector);
-        
+        localCameraHandler.SetViewInputVector(viewInputVector);        
     }
 
     public NetworkInputData GetNetworkInput()
@@ -80,13 +88,15 @@ public class CharacterInputHandler : MonoBehaviour
         //Jump data
         networkInputData.isJumpPressed = isJumpButtonPressed;
 
+        //Crouch data
         networkInputData.isCrouchedPressed = isCrouchButtonPressed;
 
+        //Shoot data
         networkInputData.isFireButtonPressed = isFireButtonPressed;
 
         //reset variables to read their states
         isJumpButtonPressed = false;
-        isFireButtonPressed = false;
+        //isFireButtonPressed = false;
 
         return networkInputData;
     }

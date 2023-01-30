@@ -164,6 +164,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfcb3d142033ee349828708a0e64c79a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moveInputVector: {x: 0, y: 0}
+  viewInputVector: {x: 0, y: 0}
+  isCrouchButtonPressed: 0
+  currentRecoilXPos: 0
+  currentRecoilYPos: 0
 --- !u!114 &5085652263384346445
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -184,6 +189,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 65
   impactEffect: {fileID: 4406780436259865834, guid: 8b057e8585d9a3e41ae27173c4479d50, type: 3}
+  gunData: {fileID: 11400000, guid: e506279dda9d46b4b8cea8928534e049, type: 2}
+  currentRecoilXPos: 0
+  currentRecoilYPos: 0
 --- !u!114 &2071121926792058595
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -222,6 +230,7 @@ MonoBehaviour:
   bodyMeshRenderer: {fileID: 7346620735152007626}
   playerModel: {fileID: 7368110339721897977}
   deathGameObjectPrefab: {fileID: 1648593125706679574, guid: d4dd9981a1e23ff428b636f126889c0a, type: 3}
+  healthText: {fileID: 1203086811283661368}
 --- !u!1 &4139411399516953490
 GameObject:
   m_ObjectHideFlags: 0
@@ -773,6 +782,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 4751178349014469797, guid: 2a8229cf9f2387d4a81c678da4a9a1ec, type: 3}
   m_PrefabInstance: {fileID: 5117894673722134642}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1203086811283661368 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6319767452370039370, guid: 2a8229cf9f2387d4a81c678da4a9a1ec, type: 3}
+  m_PrefabInstance: {fileID: 5117894673722134642}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1619944984124960613 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5871947854102396695, guid: 2a8229cf9f2387d4a81c678da4a9a1ec, type: 3}

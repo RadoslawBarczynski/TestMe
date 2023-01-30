@@ -7,27 +7,17 @@ using ExitGames.Client.Photon.StructWrapping;
 public class CharacterMovementHandler : NetworkBehaviour
 {
     bool isRespawnRequested = false;
-    float startYScale;
     float crouchYScale = 0.7f;
 
-    //Other components
+    //components
     NetworkCharacterControllerPrototypeCustom networkCharacterControllerPrototypeCustom;
     HPHandler hPHandler;
-    CharacterController characterController;
 
     private void Awake()
     {
         networkCharacterControllerPrototypeCustom = GetComponent<NetworkCharacterControllerPrototypeCustom>();
         hPHandler = GetComponent<HPHandler>();
-        characterController = GetComponent<CharacterController>();
     }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        startYScale = transform.localScale.y;
-    }
-
 
     public override void FixedUpdateNetwork()
     {
@@ -76,9 +66,13 @@ public class CharacterMovementHandler : NetworkBehaviour
             }
             else if (!networkInputData.isCrouchedPressed)
             {
-                networkCharacterControllerPrototypeCustom.UnCrouch();
+                if (transform.localScale.y < 1)
+                {
+                    transform.localScale = new Vector3(transform.localScale.x, 1, transform.localScale.z);
+                    transform.position = new Vector3(transform.position.x, 1.58f, transform.position.z);
+                    networkCharacterControllerPrototypeCustom.UnCrouch();
+                }
                 //networkCharacterControllerPrototypeCustom.Velocity = new Vector3(networkCharacterControllerPrototypeCustom.Velocity.x, 0, networkCharacterControllerPrototypeCustom.Velocity.z);
-                transform.localScale = new Vector3(transform.localScale.x, 1, transform.localScale.z);
             }
             //Check if player fallen off the world
             CheckFallRespawn();

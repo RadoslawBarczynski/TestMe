@@ -12,21 +12,26 @@ public class WeaponHandler : NetworkBehaviour
     public Transform aimPoint;
     public LayerMask collisionLayers;
     public GameObject impactEffect;
+    public Gun gunData;
 
     float lastTimeFired = 0;
+    public float currentRecoilXPos;
+    public float currentRecoilYPos;
+
 
     //components
     HPHandler hPHandler;
+    CharacterInputHandler characterInputHandler;
 
     private void Awake()
     {
         hPHandler = GetComponent<HPHandler>();
+        characterInputHandler = GetComponent<CharacterInputHandler>();
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        
     }
 
     // Update is called once per frame
@@ -50,49 +55,65 @@ public class WeaponHandler : NetworkBehaviour
     void Fire(Vector3 aimForwardVector)
     {
         //limit fire rate
-        if (Time.time - lastTimeFired < 0.15f)
-            return;
-
-        StartCoroutine(FireEffectC0());
-
-        Runner.LagCompensation.Raycast(aimPoint.position, aimForwardVector, 100, Object.InputAuthority, out var hitInfo, collisionLayers, HitOptions.IncludePhysX);
-
-        float hitDistance = 100;
-        bool isHitOtherPlayer = false;
-
-        if(hitInfo.Distance > 0)
+        if (Time.time - lastTimeFired > 1 / gunData.fireRate)
         {
-            hitDistance = hitInfo.Distance;
-        }
+            lastTimeFired = Time.time;
 
-        if (hitInfo.Hitbox != null)
-        {
-            Debug.Log($"{Time.time} {transform.name} hit hitbox {hitInfo.Hitbox.transform.root.name}");
+            StartCoroutine(FireEffectC0());
+            RecoilMath();
 
-            if (Object.HasStateAuthority)
+            Runner.LagCompensation.Raycast(aimPoint.position, aimForwardVector, 100, Object.InputAuthority, out var hitInfo, collisionLayers, HitOptions.IncludePhysX);
+
+            float hitDistance = 100;
+            bool isHitOtherPlayer = false;
+
+            if (hitInfo.Distance > 0)
             {
-               hitInfo.Hitbox.transform.root.GetComponent<HPHandler>().OnTakeDamage();
+                hitDistance = hitInfo.Distance;
             }
 
-            isHitOtherPlayer = true;
-        }
-        else if(hitInfo.Collider != null)
-        {
-            Debug.Log($"{Time.time} {transform.name} hit PhysX hitbox {hitInfo.Collider.transform.root.name}");
-            Instantiate(impactEffect, hitInfo.Point, Quaternion.LookRotation(hitInfo.Normal));
-        }
+            if (hitInfo.Hitbox != null)
+            {
+                Debug.Log($"{Time.time} {transform.name} hit hitbox {hitInfo.Hitbox.transform.root.name}");
 
-        if (isHitOtherPlayer)
-        {
-            Debug.DrawRay(aimPoint.position, aimForwardVector * hitDistance, Color.red, 1);
-        }
-        else
-        {
-            Debug.DrawRay(aimPoint.position, aimForwardVector * hitDistance, Color.green, 1);
-        }
+                if (Object.HasStateAuthority)
+                {
+                    hitInfo.Hitbox.transform.root.GetComponent<HPHandler>().OnTakeDamage();
+                }
 
+                isHitOtherPlayer = true;
+            }
+            else if (hitInfo.Collider != null)
+            {
+                Debug.Log($"{Time.time} {transform.name} hit PhysX hitbox {hitInfo.Collider.transform.root.name}");
+                Instantiate(impactEffect, hitInfo.Point, Quaternion.LookRotation(hitInfo.Normal));
+            }
 
-        lastTimeFired = Time.time;
+            if (isHitOtherPlayer)
+            {
+                Debug.DrawRay(aimPoint.position, aimForwardVector * hitDistance, Color.red, 1);
+            }
+            else
+            {
+                Debug.DrawRay(aimPoint.position, aimForwardVector * hitDistance, Color.green, 1);
+            }
+
+        }
+    }
+
+    //recoil calculations
+    public void RecoilMath()
+    {
+        if (!characterInputHandler.isCrouchButtonPressed) 
+        {
+            currentRecoilXPos = ((Random.value - .5f) / gunData.recoilValue);
+            currentRecoilYPos = ((Random.value - .5f) / gunData.recoilValue);
+        }
+        else if(characterInputHandler.isCrouchButtonPressed)
+        {
+            currentRecoilXPos = ((Random.value - .5f) / (gunData.recoilValue * 2));
+            currentRecoilYPos = ((Random.value - .5f) / (gunData.recoilValue * 2));
+        }
     }
 
     IEnumerator FireEffectC0()
@@ -130,4 +151,5 @@ public class WeaponHandler : NetworkBehaviour
             muzzleFlashEffect.Play();
         }
     }
+
 }
