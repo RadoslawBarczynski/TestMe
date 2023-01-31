@@ -6,9 +6,9 @@ public class CharacterInputHandler : MonoBehaviour
 {
     public Vector2 moveInputVector = Vector2.zero;
     public Vector2 viewInputVector = Vector2.zero;
-    bool isJumpButtonPressed = false;
+    bool _isJumpButtonPressed = false;
     public bool isCrouchButtonPressed = false;
-    bool isFireButtonPressed = false;
+    bool _isFireButtonPressed = false;
     public float currentRecoilXPos;
     public float currentRecoilYPos;
 
@@ -23,14 +23,12 @@ public class CharacterInputHandler : MonoBehaviour
         weaponHandler = GetComponent<WeaponHandler>();
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (!characterMovementHandler.Object.HasInputAuthority)
@@ -44,10 +42,10 @@ public class CharacterInputHandler : MonoBehaviour
         moveInputVector.x = Input.GetAxis("Horizontal");
         moveInputVector.y = Input.GetAxis("Vertical");
 
-        //jump input
+        //Jump input
         if (Input.GetButtonDown("Jump"))
         {
-            isJumpButtonPressed = true;
+            _isJumpButtonPressed = true;
         }            
 
         if(Input.GetButtonDown("Crouch") && isCrouchButtonPressed == false)
@@ -59,19 +57,19 @@ public class CharacterInputHandler : MonoBehaviour
             isCrouchButtonPressed = false;
         }
 
-        //fire
+        //Fire
         if (Input.GetButtonDown("Fire1"))
         {
-            isFireButtonPressed = true;
+            _isFireButtonPressed = true;
         }
         if (Input.GetButtonUp("Fire1"))
         {
-            isFireButtonPressed = false;
+            _isFireButtonPressed = false;
             weaponHandler.currentRecoilXPos = 0;
             weaponHandler.currentRecoilYPos = 0;
         }
 
-        //set view
+        //Set view
         localCameraHandler.SetViewInputVector(viewInputVector);        
     }
 
@@ -86,17 +84,16 @@ public class CharacterInputHandler : MonoBehaviour
         networkInputData.movementInput = moveInputVector;
 
         //Jump data
-        networkInputData.isJumpPressed = isJumpButtonPressed;
+        networkInputData.isJumpPressed = _isJumpButtonPressed;
 
         //Crouch data
         networkInputData.isCrouchedPressed = isCrouchButtonPressed;
 
         //Shoot data
-        networkInputData.isFireButtonPressed = isFireButtonPressed;
+        networkInputData.isFireButtonPressed = _isFireButtonPressed;
 
-        //reset variables to read their states
-        isJumpButtonPressed = false;
-        //isFireButtonPressed = false;
+        //Reset variables to read their states
+        _isJumpButtonPressed = false;
 
         return networkInputData;
     }

@@ -9,14 +9,14 @@ using TMPro;
 public class HPHandler : NetworkBehaviour
 {
     [Networked(OnChanged = nameof(OnHPChanged))]
-    byte HP { get; set; }
+    byte _HP { get; set; }
 
     [Networked(OnChanged = nameof(OnStateChanged))]
     public bool isDead { get; set; }
 
-    bool isInitialized = false;
+    bool _isInitialized = false;
 
-    const byte startingHP = 5;
+    const byte _startingHP = 5;
 
     public Color uiOnHitColor;
     public Image uiOnHitImage;
@@ -42,19 +42,19 @@ public class HPHandler : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        HP = startingHP;
+        _HP = _startingHP;
         isDead = false;
 
         defaultMeshBodyColor = bodyMeshRenderer.material.color;
 
-        isInitialized = true;
+        _isInitialized = true;
     }
 
     void Update()
     {
         //health state display 
         if(Object.HasInputAuthority)
-        healthText.text = "Health: " + HP + "/" + startingHP;
+        healthText.text = "Health: " + _HP + "/" + _startingHP;
     }
 
     IEnumerator OnHitCO()
@@ -90,14 +90,10 @@ public class HPHandler : NetworkBehaviour
             return;
         }
 
-        HP -= (byte)weaponHandler.gunData.damage;
+        _HP -= (byte)weaponHandler.gunData.damage;
 
-        Debug.Log($"{Time.time} {transform.name} has {HP} left");
-
-        if (HP <= 0)
+        if (_HP <= 0)
         {
-            Debug.Log($"{Time.time} {transform.name} died");
-
             StartCoroutine(ServerReviveCO());
 
             isDead = true;
@@ -106,13 +102,11 @@ public class HPHandler : NetworkBehaviour
 
     static void OnHPChanged(Changed<HPHandler> changed)
     {
-        Debug.Log($"{Time.time} OnHPChanged value {changed.Behaviour.HP}");
-
-        byte newHP = changed.Behaviour.HP;
+        byte newHP = changed.Behaviour._HP;
 
         changed.LoadOld();
 
-        byte oldHP = changed.Behaviour.HP;
+        byte oldHP = changed.Behaviour._HP;
 
         if(newHP < oldHP)
         {
@@ -122,7 +116,7 @@ public class HPHandler : NetworkBehaviour
 
     private void OnHPReduced()
     {
-        if (!isInitialized)
+        if (!_isInitialized)
         {
             return;
         }
@@ -131,8 +125,6 @@ public class HPHandler : NetworkBehaviour
 
     static void OnStateChanged(Changed<HPHandler> changed)
     {
-        Debug.Log($"{Time.time} OnHPChanged value {changed.Behaviour.isDead}");
-
         bool isDeadCurrent = changed.Behaviour.isDead;
 
         changed.LoadOld();
@@ -172,7 +164,7 @@ public class HPHandler : NetworkBehaviour
 
     public void OnRespawned()
     {
-        HP = startingHP;
+        _HP = _startingHP;
         isDead = false;
     }
 }

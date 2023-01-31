@@ -2,11 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
+using UnityEngine.UI;
 
 public class WeaponHandler : NetworkBehaviour
 {
     [Networked(OnChanged = nameof(OnFireChanged))]
     public bool isFiring { get; set; }
+
+    [SerializeField]
+    Image _hitMarkImage;
 
     public ParticleSystem muzzleFlashEffect;
     public Transform aimPoint;
@@ -14,7 +18,7 @@ public class WeaponHandler : NetworkBehaviour
     public GameObject impactEffect;
     public Gun gunData;
 
-    float lastTimeFired = 0;
+    float _lastTimeFired = 0;
     public float currentRecoilXPos;
     public float currentRecoilYPos;
 
@@ -29,12 +33,6 @@ public class WeaponHandler : NetworkBehaviour
         characterInputHandler = GetComponent<CharacterInputHandler>();
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-    }
-
-    // Update is called once per frame
     public override void FixedUpdateNetwork()
     {
         if (hPHandler.isDead)
@@ -55,14 +53,14 @@ public class WeaponHandler : NetworkBehaviour
     void Fire(Vector3 aimForwardVector)
     {
         //limit fire rate
-        if (Time.time - lastTimeFired > 1 / gunData.fireRate)
+        if (Time.time - _lastTimeFired > 1 / gunData.fireRate)
         {
-            lastTimeFired = Time.time;
+            _lastTimeFired = Time.time;
 
             StartCoroutine(FireEffectC0());
             RecoilMath();
 
-            Runner.LagCompensation.Raycast(aimPoint.position, aimForwardVector, 100, Object.InputAuthority, out var hitInfo, collisionLayers, HitOptions.IncludePhysX);
+            Runner.LagCompensation.Raycast(aimPoint.position, aimForwardVector, 100, Object.InputAuthority, out var hitInfo, collisionLayers, HitOptions.IncludePhysX | HitOptions.IgnoreInputAuthority);
 
             float hitDistance = 100;
             bool isHitOtherPlayer = false;
@@ -74,8 +72,6 @@ public class WeaponHandler : NetworkBehaviour
 
             if (hitInfo.Hitbox != null)
             {
-                Debug.Log($"{Time.time} {transform.name} hit hitbox {hitInfo.Hitbox.transform.root.name}");
-
                 if (Object.HasStateAuthority)
                 {
                     hitInfo.Hitbox.transform.root.GetComponent<HPHandler>().OnTakeDamage();
@@ -85,13 +81,16 @@ public class WeaponHandler : NetworkBehaviour
             }
             else if (hitInfo.Collider != null)
             {
-                Debug.Log($"{Time.time} {transform.name} hit PhysX hitbox {hitInfo.Collider.transform.root.name}");
                 Instantiate(impactEffect, hitInfo.Point, Quaternion.LookRotation(hitInfo.Normal));
             }
-
+            //Check a shoot ray in editor
             if (isHitOtherPlayer)
             {
                 Debug.DrawRay(aimPoint.position, aimForwardVector * hitDistance, Color.red, 1);
+                if (Object.HasInputAuthority)
+                {
+                    StartCoroutine(HitMarkEffect());
+                }
             }
             else
             {
@@ -127,10 +126,17 @@ public class WeaponHandler : NetworkBehaviour
         isFiring = false;
     }
 
+    IEnumerator HitMarkEffect()
+    {
+        _hitMarkImage.enabled = true;
+
+        yield return new WaitForSeconds(0.2f);
+
+        _hitMarkImage.enabled = false;
+    }
+
     static void OnFireChanged(Changed<WeaponHandler> changed)
     {
-        //Debug.Log($"{Time.time} OnFireChanged value {changed.Behaviour.isFiring}");
-
         bool isFiringCurrent = changed.Behaviour.isFiring;
 
         //load old value

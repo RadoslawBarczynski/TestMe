@@ -183,6 +183,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   _isFiring: 0
+  _hitMarkImage: {fileID: 4698506953155400414}
   muzzleFlashEffect: {fileID: 6728045690681911747}
   aimPoint: {fileID: 2644404326036250499}
   collisionLayers:
@@ -796,6 +797,17 @@ MonoBehaviour:
 --- !u!114 &1619944984124960613 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5871947854102396695, guid: 2a8229cf9f2387d4a81c678da4a9a1ec, type: 3}
+  m_PrefabInstance: {fileID: 5117894673722134642}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &4698506953155400414 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 446447046012273324, guid: 2a8229cf9f2387d4a81c678da4a9a1ec, type: 3}
   m_PrefabInstance: {fileID: 5117894673722134642}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}

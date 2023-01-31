@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Default Local Group
+  m_EditorClassIdentifier: 
+  m_GroupName: Default Local Group
+  m_Data:
+    m_SerializedData: []
+  m_GUID: c78e4b71c0001054c9d176817585c0d7
+  m_SerializeEntries:
+  - m_GUID: 39f25e1f2b5c9444190920a83be67f71
+    m_Address: Assets/Music/risk-136788.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 59b557616d8d0c34eb9688cd0b71777b
+    m_Address: Assets/Music/password-infinity-123276.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: c16c898af105d3d459660ac1274b39b0
+    m_Address: Assets/Music/abstract-fashion-pop-131283.mp3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: abed4fab3088f2d4097a9b34379c6d7a, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 9d2ffe18f4222f64db56c0fb8fefbe71, type: 2}
+    - {fileID: 11400000, guid: 4b8075436c0f0b84db7927b7ce055982, type: 2}

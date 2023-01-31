@@ -6,8 +6,8 @@ using ExitGames.Client.Photon.StructWrapping;
 
 public class CharacterMovementHandler : NetworkBehaviour
 {
-    bool isRespawnRequested = false;
-    float crouchYScale = 0.7f;
+    bool _isRespawnRequested = false;
+    float _crouchYScale = 0.7f;
 
     //components
     NetworkCharacterControllerPrototypeCustom networkCharacterControllerPrototypeCustom;
@@ -23,13 +23,13 @@ public class CharacterMovementHandler : NetworkBehaviour
     {
         if (Object.HasStateAuthority)
         {
-            if (isRespawnRequested)
+            if (_isRespawnRequested)
             {
                 Respawn();
                 return;
             }
 
-            //dont update the clients position when they are dead
+            //Dont update the clients position when they are dead
             if (hPHandler.isDead)
             {
                 return;
@@ -39,10 +39,10 @@ public class CharacterMovementHandler : NetworkBehaviour
         //Get the input from the network
         if (GetInput(out NetworkInputData networkInputData))
         {
-            //rotate the transform according to the client aim vector
+            //Rotate the transform according to the client aim vector
             transform.forward = networkInputData.aimForwardVector;
 
-            //disable player tilting
+            //Disable player tilting
             Quaternion rotation = transform.rotation;
             rotation.eulerAngles = new Vector3(0, rotation.eulerAngles.y, rotation.eulerAngles.z);
             transform.rotation = rotation;
@@ -62,7 +62,7 @@ public class CharacterMovementHandler : NetworkBehaviour
             if (networkInputData.isCrouchedPressed)
             {
                 networkCharacterControllerPrototypeCustom.Crouch();
-                transform.localScale = new Vector3(transform.localScale.x, crouchYScale, transform.localScale.z);
+                transform.localScale = new Vector3(transform.localScale.x, _crouchYScale, transform.localScale.z);
             }
             else if (!networkInputData.isCrouchedPressed)
             {
@@ -72,7 +72,6 @@ public class CharacterMovementHandler : NetworkBehaviour
                     transform.position = new Vector3(transform.position.x, 1.58f, transform.position.z);
                     networkCharacterControllerPrototypeCustom.UnCrouch();
                 }
-                //networkCharacterControllerPrototypeCustom.Velocity = new Vector3(networkCharacterControllerPrototypeCustom.Velocity.x, 0, networkCharacterControllerPrototypeCustom.Velocity.z);
             }
             //Check if player fallen off the world
             CheckFallRespawn();
@@ -89,7 +88,7 @@ public class CharacterMovementHandler : NetworkBehaviour
 
     public void RequestRespawn()
     {
-        isRespawnRequested = true;
+        _isRespawnRequested = true;
     }
 
     void Respawn()
@@ -98,7 +97,7 @@ public class CharacterMovementHandler : NetworkBehaviour
 
         hPHandler.OnRespawned();
 
-        isRespawnRequested = false;
+        _isRespawnRequested = false;
     }
 
     public void SetCharacterControllerEnabled(bool isEnabled)
